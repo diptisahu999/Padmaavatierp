@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Sale Order Form to add SAP Code column in Order Lines -->
+    <record id="view_order_form_inherit_sap_code" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.sap.code</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//list//field[@name='product_template_id']" position="after">
+                <field name="sap_code" optional="show"/>
+                <field name="part_number" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

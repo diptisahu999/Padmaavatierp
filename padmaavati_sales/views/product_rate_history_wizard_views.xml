@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_product_rate_history_wizard_form" model="ir.ui.view">
+        <field name="name">product.rate.history.wizard.form</field>
+        <field name="model">product.rate.history.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rate &amp; Price History">
+                <div class="row bg-light p-3 mb-3 rounded border">
+                    <div class="col-md-7">
+                        <h4 class="mb-1"><field name="product_id" class="fw-bold" readonly="1"/></h4>
+                        <div class="text-muted">
+                            <span invisible="not sap_code"><strong>SAP Code: </strong><field name="sap_code" class="d-inline"/> | </span>
+                            <span invisible="not part_number"><strong>Part No: </strong><field name="part_number" class="d-inline"/></span>
+                        </div>
+                    </div>
+                    <div class="col-md-5 text-end">
+                        <div class="p-2 bg-white rounded border d-inline-block">
+                            <span class="text-muted d-block small">Current Standard Cost:</span>
+                            <span class="fs-5 fw-bold text-primary">
+                                <field name="current_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                        </div>
+                        <field name="currency_id" invisible="1"/>
+                    </div>
+                </div>
+
+                <notebook>
+                    <!-- Previous Sales History Tab -->
+                    <page string="Previous Sales History" name="sales_history">
+                        <field name="sale_history_ids" readonly="1">
+                            <list string="Previous Sales" empty_message="No previous sales found for this product.">
+                                <field name="order_date" string="Date"/>
+                                <field name="partner_id" string="Customer"/>
+                                <field name="doc_ref" string="Order / Invoice"/>
+                                <field name="qty" string="Qty"/>
+                                <field name="unit_price" string="Sell Rate" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="currency_id" column_invisible="True"/>
+                                <field name="status" widget="badge"/>
+                                <button name="action_apply_rate" string="Use This Rate" type="object" icon="fa-check" class="btn-sm btn-outline-primary"/>
+                            </list>
+                        </field>
+                    </page>
+
+                    <!-- Previous Purchases History Tab -->
+                    <page string="Previous Purchase History" name="purchase_history">
+                        <field name="purchase_history_ids" readonly="1">
+                            <list string="Previous Purchases" empty_message="No previous purchases or vendor bills found for this product.">
+                                <field name="order_date" string="Date"/>
+                                <field name="partner_id" string="Vendor"/>
+                                <field name="doc_ref" string="Bill / PO / Pricelist"/>
+                                <field name="qty" string="Qty"/>
+                                <field name="unit_price" string="Purchase Rate" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="currency_id" column_invisible="True"/>
+                                <field name="status" widget="badge"/>
+                                <button name="action_apply_rate" string="Use This Rate" type="object" icon="fa-check" class="btn-sm btn-outline-success"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

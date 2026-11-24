@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Rate History action button to Sale Order Lines -->
+    <record id="view_order_form_inherit_rate_history" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.rate.history</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//list//field[@name='price_unit']" position="after">
+                <button
+                    name="action_open_rate_history"
+                    type="object"
+                    icon="fa-history"
+                    title="View Previous Sale &amp; Purchase Rates"
+                    class="btn-link text-primary"
+                    invisible="not product_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Rate History action button to Customer Invoice Lines -->
+    <record id="view_move_form_inherit_rate_history" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.rate.history</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']//list//field[@name='price_unit']" position="after">
+                <button
+                    name="action_open_rate_history"
+                    type="object"
+                    icon="fa-history"
+                    title="View Previous Sale &amp; Purchase Rates"
+                    class="btn-link text-primary"
+                    invisible="not product_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

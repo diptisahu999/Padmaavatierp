@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Sale Order Form to add Weight / Nos and Total Weight -->
+    <record id="view_order_form_inherit_weight" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.weight</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Weight columns after Quantity in Order Lines -->
+            <xpath expr="//field[@name='order_line']//list//field[@name='product_uom_qty']" position="after">
+                <field name="weight_per_nos" string="Weight / Nos" optional="show"/>
+                <field name="total_weight" string="Total Wt" optional="show" readonly="1"/>
+            </xpath>
+            <!-- Add Total Order Weight under tax totals -->
+            <xpath expr="//field[@name='tax_totals']" position="after">
+                <field name="total_weight" string="Total Weight" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Customer Invoice Form to add Weight / Nos and Total Weight -->
+    <record id="view_move_form_inherit_weight" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.weight</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Weight columns after Quantity in Invoice Lines -->
+            <xpath expr="//field[@name='invoice_line_ids']//list//field[@name='quantity']" position="after">
+                <field name="weight_per_nos" string="Weight / Nos" optional="show"/>
+                <field name="total_weight" string="Total Wt" optional="show" readonly="1"/>
+            </xpath>
+            <!-- Add Total Invoice Weight under tax totals -->
+            <xpath expr="//field[@name='tax_totals']" position="after">
+                <field name="total_weight" string="Total Weight" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

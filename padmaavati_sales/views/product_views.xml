@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Product Template Form View to add SAP Code -->
+    <record id="product_template_form_view_inherit_sap_code" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.sap.code</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="sap_code" placeholder="e.g. SAP100452"/>
+                <field name="part_number" placeholder="e.g. PN-98765"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Product Template Search View to search by SAP Code / Part No -->
+    <record id="product_template_search_view_inherit_sap_code" model="ir.ui.view">
+        <field name="name">product.template.search.inherit.sap.code</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="sap_code" filter_domain="[('sap_code', 'ilike', self)]"/>
+                <field name="part_number" filter_domain="[('part_number', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

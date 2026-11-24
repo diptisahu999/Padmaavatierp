@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Sale Order Form to add HD Product Image in Order Lines -->
+    <record id="view_order_form_inherit_product_image" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.product.image</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//list//field[@name='product_template_id']" position="before">
+                <field
+                    name="product_image"
+                    string="Image"
+                    widget="image"
+                    options="{'size': [40, 40], 'zoom': True}"
+                    class="oe_avatar"
+                    width="50px"
+                    optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Customer Invoice Form to add HD Product Image in Invoice Lines -->
+    <record id="view_move_form_inherit_product_image" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.product.image</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']//list//field[@name='product_id']" position="before">
+                <field
+                    name="product_image"
+                    string="Image"
+                    widget="image"
+                    options="{'size': [40, 40], 'zoom': True}"
+                    class="oe_avatar"
+                    width="50px"
+                    optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
