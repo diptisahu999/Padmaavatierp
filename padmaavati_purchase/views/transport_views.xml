@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action from Transporter Stat Button to Vehicles (Declared first so ID is available in form view) -->
+    <record id="action_padmaavati_transport_vehicle_from_transporter" model="ir.actions.act_window">
+        <field name="name">Vehicles</field>
+        <field name="res_model">padmaavati.transport.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('transport_id', '=', active_id)]</field>
+        <field name="context">{'default_transport_id': active_id}</field>
+    </record>
+
+    <!-- ========================================== -->
+    <!-- Transporter Master Views                   -->
+    <!-- ========================================== -->
+
+    <!-- Form View: padmaavati.transport -->
+    <record id="view_padmaavati_transport_form" model="ir.ui.view">
+        <field name="name">padmaavati.transport.form</field>
+        <field name="model">padmaavati.transport</field>
+        <field name="arch" type="xml">
+            <form string="Transport Carrier Agency">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="action"
+                                name="%(action_padmaavati_transport_vehicle_from_transporter)d"
+                                icon="fa-truck">
+                            <field string="Vehicles" name="vehicle_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Transporter Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. V-Trans, TCI Freight, Safexpress"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Identification &amp; GST Details">
+                            <field name="code" placeholder="GSTIN or Transporter ID (E-Way Bill)"/>
+                            <field name="partner_id" placeholder="Select linked Partner contact"/>
+                            <field name="contact_person" placeholder="Manager / Booking Agent"/>
+                            <field name="phone" widget="phone" placeholder="+91 98765 43210"/>
+                            <field name="email" widget="email" placeholder="transport@carrier.com"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Agency Address">
+                            <field name="address" placeholder="Branch Office / Godown Address" nolabel="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Registered Vehicles / Tempos" name="vehicles">
+                            <field name="vehicle_ids">
+                                <list string="Vehicles" editable="bottom">
+                                    <field name="vehicle_no" placeholder="e.g. MH04 AB 1234"/>
+                                    <field name="name" placeholder="e.g. Tata Ace, Bolero Pickup"/>
+                                    <field name="ewaybill_vehicle_type" string="E-Way Bill Type"/>
+                                    <field name="vehicle_type" string="Fleet Category"/>
+                                    <field name="driver_name"/>
+                                    <field name="driver_phone"/>
+                                    <field name="active" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View: padmaavati.transport -->
+    <record id="view_padmaavati_transport_tree" model="ir.ui.view">
+        <field name="name">padmaavati.transport.tree</field>
+        <field name="model">padmaavati.transport</field>
+        <field name="arch" type="xml">
+            <list string="Transport Carriers">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="contact_person"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="vehicle_count" string="Vehicles Registered"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View: padmaavati.transport -->
+    <record id="view_padmaavati_transport_search" model="ir.ui.view">
+        <field name="name">padmaavati.transport.search</field>
+        <field name="model">padmaavati.transport</field>
+        <field name="arch" type="xml">
+            <search string="Search Transporters">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="contact_person"/>
+                <field name="phone"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action: padmaavati.transport -->
+    <record id="action_padmaavati_transport" model="ir.actions.act_window">
+        <field name="name">Transporters</field>
+        <field name="res_model">padmaavati.transport</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_padmaavati_transport_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a new Transport Carrier Agency
+            </p>
+            <p>
+                Keep track of external transport companies, GSTIN Transporter IDs for E-Way Bill, contact details, and their registered tempos/trucks.
+            </p>
+        </field>
+    </record>
+
+
+    <!-- ========================================== -->
+    <!-- Vehicle / Tempo Master Views               -->
+    <!-- ========================================== -->
+
+    <!-- Form View: padmaavati.transport.vehicle -->
+    <record id="view_padmaavati_transport_vehicle_form" model="ir.ui.view">
+        <field name="name">padmaavati.transport.vehicle.form</field>
+        <field name="model">padmaavati.transport.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Vehicle / Tempo">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="vehicle_no" string="Registration Number"/>
+                        <h1>
+                            <field name="vehicle_no" placeholder="e.g. MH04 AB 1234"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Vehicle Specifications">
+                            <field name="name" placeholder="e.g. Tata Ace, Bolero Pickup, Eicher 17ft"/>
+                            <field name="transport_id" required="1"/>
+                            <field name="ewaybill_vehicle_type"/>
+                            <field name="vehicle_type"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Driver Details">
+                            <field name="driver_name" placeholder="Assigned Driver Name"/>
+                            <field name="driver_phone" widget="phone" placeholder="Driver Mobile No."/>
+                        </group>
+                    </group>
+                    <group string="Notes &amp; Remarks">
+                        <field name="notes" placeholder="Any special instructions, capacity, route notes..." nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View: padmaavati.transport.vehicle -->
+    <record id="view_padmaavati_transport_vehicle_tree" model="ir.ui.view">
+        <field name="name">padmaavati.transport.vehicle.tree</field>
+        <field name="model">padmaavati.transport.vehicle</field>
+        <field name="arch" type="xml">
+            <list string="Vehicles / Tempos">
+                <field name="vehicle_no"/>
+                <field name="name"/>
+                <field name="transport_id"/>
+                <field name="ewaybill_vehicle_type" string="E-Way Bill Type"/>
+                <field name="vehicle_type" string="Fleet Category"/>
+                <field name="driver_name"/>
+                <field name="driver_phone"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View: padmaavati.transport.vehicle -->
+    <record id="view_padmaavati_transport_vehicle_search" model="ir.ui.view">
+        <field name="name">padmaavati.transport.vehicle.search</field>
+        <field name="model">padmaavati.transport.vehicle</field>
+        <field name="arch" type="xml">
+            <search string="Search Vehicles">
+                <field name="vehicle_no"/>
+                <field name="name"/>
+                <field name="driver_name"/>
+                <field name="transport_id"/>
+                <filter string="Group by Transporter" name="group_by_transport" domain="[]" context="{'group_by': 'transport_id'}"/>
+                <filter string="Group by Vehicle Type" name="group_by_type" domain="[]" context="{'group_by': 'vehicle_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action: padmaavati.transport.vehicle -->
+    <record id="action_padmaavati_transport_vehicle" model="ir.actions.act_window">
+        <field name="name">Vehicles &amp; Tempos</field>
+        <field name="res_model">padmaavati.transport.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_padmaavati_transport_vehicle_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a new Vehicle / Tempo
+            </p>
+            <p>
+                Maintain tempo numbers, truck types, and default driver contact details linked to transporters.
+            </p>
+        </field>
+    </record>
+
+
+    <!-- ========================================== -->
+    <!-- Menus under Purchase App                   -->
+    <!-- ========================================== -->
+
+    <!-- Purchase -> Logistics Menu -->
+    <menuitem id="menu_padmaavati_purchase_logistics"
+              name="Logistics"
+              parent="purchase.menu_purchase_root"
+              sequence="15"/>
+
+    <menuitem id="menu_padmaavati_transport_orders"
+              name="Transporters"
+              parent="menu_padmaavati_purchase_logistics"
+              action="action_padmaavati_transport"
+              sequence="10"/>
+
+    <menuitem id="menu_padmaavati_transport_vehicle_orders"
+              name="Vehicles / Tempos"
+              parent="menu_padmaavati_purchase_logistics"
+              action="action_padmaavati_transport_vehicle"
+              sequence="20"/>
+
+    <!-- Purchase -> Configuration -> Transports & Vehicles Menu -->
+    <menuitem id="menu_padmaavati_transport_config_root"
+              name="Transport &amp; Vehicles"
+              parent="purchase.menu_purchase_config"
+              sequence="60"/>
+
+    <menuitem id="menu_padmaavati_transport_config"
+              name="Transporters"
+              parent="menu_padmaavati_transport_config_root"
+              action="action_padmaavati_transport"
+              sequence="10"/>
+
+    <menuitem id="menu_padmaavati_transport_vehicle_config"
+              name="Vehicles / Tempos"
+              parent="menu_padmaavati_transport_config_root"
+              action="action_padmaavati_transport_vehicle"
+              sequence="20"/>
+</odoo>

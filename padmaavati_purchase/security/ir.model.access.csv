@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_padmaavati_transport_user,padmaavati.transport.user,model_padmaavati_transport,base.group_user,1,1,1,1
+access_padmaavati_transport_vehicle_user,padmaavati.transport.vehicle.user,model_padmaavati_transport_vehicle,base.group_user,1,1,1,1
