@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Inherit Sale Order Form to add SAP Code column in Order Lines -->
+    <!-- Inherit Sale Order Form to add SAP Code, Part No, and HSN Code in Order Lines -->
     <record id="view_order_form_inherit_sap_code" model="ir.ui.view">
         <field name="name">sale.order.form.inherit.sap.code</field>
         <field name="model">sale.order</field>
@@ -9,6 +9,44 @@
             <xpath expr="//field[@name='order_line']//list//field[@name='product_template_id']" position="after">
                 <field name="sap_code" optional="show"/>
                 <field name="part_number" optional="show"/>
+                <field name="hsn_code" optional="show"/>
+            </xpath>
+            
+            <!-- Add Dispatch, Cash Discount, Freight and Bank Details to Other Info or Page -->
+            <xpath expr="//page[@name='other_information']" position="inside">
+                <group string="Dispatch &amp; Delivery Details" name="dispatch_delivery_details">
+                    <group>
+                        <field name="lr_no" placeholder="e.g. LR-987654"/>
+                        <field name="lr_date"/>
+                        <field name="terms_of_delivery" placeholder="e.g. Ex-Works / Door Delivery"/>
+                        <field name="payment_terms_note" placeholder="e.g. 100% Advance"/>
+                    </group>
+                    <group string="Cash Discount &amp; Freight">
+                        <label for="cash_discount_percent"/>
+                        <div class="o_row">
+                            <field name="cash_discount_percent" class="oe_inline"/>
+                            <span>%</span>
+                        </div>
+                        <field name="cash_discount_amount"/>
+                        <field name="freight_amount"/>
+                        <label for="freight_tax_rate"/>
+                        <div class="o_row">
+                            <field name="freight_tax_rate" class="oe_inline"/>
+                            <span>%</span>
+                        </div>
+                    </group>
+                </group>
+                <group string="Document Bank Details" name="print_bank_details">
+                    <group>
+                        <field name="bank_name"/>
+                        <field name="bank_account_name"/>
+                        <field name="bank_account_no"/>
+                    </group>
+                    <group>
+                        <field name="bank_ifsc"/>
+                        <field name="bank_branch"/>
+                    </group>
+                </group>
             </xpath>
         </field>
     </record>

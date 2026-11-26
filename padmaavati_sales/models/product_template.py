@@ -17,6 +17,12 @@ class ProductTemplate(models.Model):
         index=True,
         help='Manufacturer or Customer Part Number',
     )
+    hsn_code = fields.Char(
+        string='HSN Code',
+        copy=False,
+        index=True,
+        help='Harmonized System Nomenclature (HSN) Code for GST',
+    )
 
 
 class ProductProduct(models.Model):
@@ -35,4 +41,11 @@ class ProductProduct(models.Model):
         readonly=False,
         store=True,
         help='Manufacturer or Customer Part Number',
+    )
+    hsn_code = fields.Char(
+        string='HSN Code',
+        related='product_tmpl_id.hsn_code',
+        readonly=False,
+        store=True,
+        help='Harmonized System Nomenclature (HSN) Code for GST',
     )
