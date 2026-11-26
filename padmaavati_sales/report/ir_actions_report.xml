@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Update standard sale reports with Padmaavati Paperformat -->
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
+        <field name="paperformat_id" ref="padmaavati_sales.paperformat_padmaavati_sale"/>
+    </record>
+
+    <record id="sale.action_report_pro_forma_invoice" model="ir.actions.report">
+        <field name="paperformat_id" ref="padmaavati_sales.paperformat_padmaavati_sale"/>
+    </record>
+
+    <!-- Dedicated Report Action: Padmaavati Quotation / Sales Order -->
+    <record id="action_report_padmaavati_saleorder" model="ir.actions.report">
+        <field name="name">Padmaavati Format (Quotation / Order)</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">padmaavati_sales.report_padmaavati_saleorder</field>
+        <field name="report_file">padmaavati_sales.report_padmaavati_saleorder</field>
+        <field name="print_report_name">(object.state in ('draft', 'sent') and 'Quotation - %s' % (object.name)) or 'Order - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="padmaavati_sales.paperformat_padmaavati_sale"/>
+    </record>
+
+    <!-- Dedicated Report Action: Padmaavati PRO-FORMA Invoice -->
+    <record id="action_report_padmaavati_proforma" model="ir.actions.report">
+        <field name="name">Padmaavati Format (PRO-FORMA Invoice)</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">padmaavati_sales.report_padmaavati_saleorder_proforma</field>
+        <field name="report_file">padmaavati_sales.report_padmaavati_saleorder_proforma</field>
+        <field name="print_report_name">'PRO-FORMA - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="padmaavati_sales.paperformat_padmaavati_sale"/>
+    </record>
+</odoo>

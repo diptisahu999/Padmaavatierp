@@ -1,0 +1,450 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Custom Paperformat for Padmaavati Sale Documents -->
+    <record id="paperformat_padmaavati_sale" model="report.paperformat">
+        <field name="name">Padmaavati A4 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- ============================================================
+         MASTER DOCUMENT TEMPLATE — full-page A4 layout
+    ============================================================ -->
+    <template id="padmaavati_report_saleorder_document">
+        <div style="font-family: 'Arial Unicode MS', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+                    color: #111; font-size: 11pt; line-height: 1.45;
+                    width: 100%; box-sizing: border-box;"
+             t-att-data-oe-model="doc and doc._name"
+             t-att-data-oe-id="doc and doc.id">
+
+            <t t-set="is_proforma" t-value="env.context.get('proforma', False) or is_pro_forma"/>
+
+            <!-- ═══ 1. HEADER ═══ -->
+            <table style="width:100%; border-collapse:collapse; margin-bottom:8pt;">
+                <tr>
+                    <!-- Logo -->
+                    <td style="width:12%; vertical-align:middle; padding-right:10pt;">
+                        <img t-if="doc._get_report_logo_src()"
+                             t-att-src="doc._get_report_logo_src()"
+                             style="max-height:80pt; max-width:85pt; display:block;"
+                             alt="Logo"/>
+                    </td>
+                    <!-- Company name + address block -->
+                    <td style="width:88%; vertical-align:top;">
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:4pt;">
+                            <tr>
+                                <!-- Company name bar -->
+                                <td style="background:#a2c7dd; color:#173b5e;
+                                           font-size:19pt; font-weight:900;
+                                           padding:8pt 12pt; letter-spacing:0.3pt;
+                                           text-transform:uppercase; vertical-align:middle;">
+                                    <span t-out="doc.company_id.name if doc.company_id.name and doc.company_id.name != 'My Company' else 'PADMAAVATI ENGINEERS LLP'"/>
+                                </td>
+                                <!-- Document-type badge -->
+                                <td style="background:#6e2525; color:#fff;
+                                           width:26%; text-align:center; vertical-align:middle;
+                                           padding:6pt 10pt; font-size:15pt; font-weight:bold;
+                                           line-height:1.2; text-transform:uppercase;">
+                                    <t t-if="is_proforma"><div>PROFORMA</div><div>INVOICE</div></t>
+                                    <t t-elif="doc.state in ['draft','sent']"><div style="padding:5pt 0;">QUOTATION</div></t>
+                                    <t t-else=""><div>SALES</div><div>ORDER</div></t>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Address line -->
+                        <div style="font-size:9.5pt; color:#222; line-height:1.4; padding-left:2pt;">
+                            A70, Silk Heritage Industrial Park, Opp. Color Tex, Sachin-Palsana Highway, UNN, Surat - 394230, Gujarat [India]<br/>
+                            Email: <span t-out="doc.company_id.partner_id.email or 'office.padmavati@gmail.com'"/> |
+                            Website: <span t-out="doc.company_id.partner_id.website or 'www.wovensackspare.com'"/> |
+                            GSTIN: <span t-out="doc.company_id.vat or '[Enter GSTIN]'"/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- ═══ 2. BILL TO / SHIP TO / DETAILS ═══ -->
+            <table style="width:100%; border-collapse:collapse; margin-bottom:8pt; border:1.5pt solid #207e8a;">
+                <thead>
+                    <tr style="background:#207e8a; color:#fff; font-size:10pt; font-weight:bold; text-transform:uppercase;">
+                        <th style="width:35%; padding:5pt 7pt; border:1pt solid #207e8a; text-align:left;">BILL TO</th>
+                        <th style="width:35%; padding:5pt 7pt; border:1pt solid #207e8a; text-align:left;">SHIP TO</th>
+                        <th style="width:30%; padding:5pt 7pt; border:1pt solid #207e8a; text-align:left;">
+                            <t t-if="is_proforma">INVOICE DETAILS</t>
+                            <t t-elif="doc.state in ['draft','sent']">QUOTATION DETAILS</t>
+                            <t t-else="">ORDER DETAILS</t>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="font-size:10pt; line-height:1.6; vertical-align:top; background:#fff;">
+                        <!-- BILL TO -->
+                        <td style="padding:7pt 8pt; border:1pt solid #207e8a;">
+                            <div style="font-weight:bold; font-size:10.5pt;"><span t-out="doc.partner_id.name"/></div>
+                            <div>
+                                <span t-if="doc.partner_id.street" t-out="doc.partner_id.street"/><br t-if="doc.partner_id.street"/>
+                                <span t-if="doc.partner_id.street2" t-out="doc.partner_id.street2"/><br t-if="doc.partner_id.street2"/>
+                                <span t-if="doc.partner_id.city" t-out="doc.partner_id.city"/>
+                                <span t-if="doc.partner_id.zip"> - <span t-out="doc.partner_id.zip"/></span>
+                                <span t-if="doc.partner_id.state_id">, <span t-out="doc.partner_id.state_id.name"/></span>
+                            </div>
+                            <div t-if="doc.partner_id.vat">GSTIN: <span t-out="doc.partner_id.vat"/></div>
+                            <div t-if="doc.partner_id.phone">Contact: <span t-out="doc.partner_id.phone"/></div>
+                        </td>
+                        <!-- SHIP TO -->
+                        <td style="padding:7pt 8pt; border:1pt solid #207e8a;">
+                            <t t-if="doc.partner_shipping_id and doc.partner_shipping_id != doc.partner_id">
+                                <div style="font-weight:bold; font-size:10.5pt;"><span t-out="doc.partner_shipping_id.name"/></div>
+                                <div>
+                                    <span t-if="doc.partner_shipping_id.street" t-out="doc.partner_shipping_id.street"/><br t-if="doc.partner_shipping_id.street"/>
+                                    <span t-if="doc.partner_shipping_id.city" t-out="doc.partner_shipping_id.city"/>
+                                    <span t-if="doc.partner_shipping_id.zip"> - <span t-out="doc.partner_shipping_id.zip"/></span>
+                                    <span t-if="doc.partner_shipping_id.state_id">, <span t-out="doc.partner_shipping_id.state_id.name"/></span>
+                                </div>
+                                <div t-if="doc.partner_shipping_id.vat">GSTIN: <span t-out="doc.partner_shipping_id.vat"/></div>
+                            </t>
+                            <t t-else=""><div style="color:#444;">Same as Billing Address</div></t>
+                        </td>
+                        <!-- DETAILS -->
+                        <td style="padding:5pt 8pt; border:1pt solid #207e8a;">
+                            <table style="width:100%; border-collapse:collapse; font-size:10pt;">
+                                <tr>
+                                    <td style="width:46%; color:#333; padding:2pt 0;">
+                                        <t t-if="is_proforma"><strong>PI No.:</strong></t>
+                                        <t t-elif="doc.state in ['draft','sent']"><strong>Quotation No.:</strong></t>
+                                        <t t-else=""><strong>SO No.:</strong></t>
+                                    </td>
+                                    <td style="width:54%; font-weight:bold; padding:2pt 0;"><span t-out="doc.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#333; padding:2pt 0;"><strong>PO No.:</strong></td>
+                                    <td style="padding:2pt 0;"><span t-out="doc.client_order_ref or '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#333; padding:2pt 0;"><strong>Date:</strong></td>
+                                    <td style="padding:2pt 0;"><span t-if="doc.date_order" t-out="doc.date_order.strftime('%d-%b-%Y')"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#333; padding:2pt 0;"><strong>Payment:</strong></td>
+                                    <td style="padding:2pt 0;"><span t-out="doc.payment_terms_note or (doc.payment_term_id and doc.payment_term_id.name) or '100% Advance'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#333; padding:2pt 0;"><strong>Terms of Delivery:</strong></td>
+                                    <td style="padding:2pt 0;"><span t-out="doc.terms_of_delivery or '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#333; padding:2pt 0;"><strong>LR No.:</strong></td>
+                                    <td style="padding:2pt 0;"><span t-out="doc.lr_no or '-'"/></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ═══ 3. LINE ITEMS TABLE ═══ -->
+            <table style="width:100%; border-collapse:collapse; margin-bottom:8pt;">
+                <thead>
+                    <tr style="background:#173b5e; color:#fff; font-size:9.5pt; font-weight:bold;
+                                text-align:center; vertical-align:middle;">
+                        <th style="width:4%;  padding:6pt 2pt; border:1pt solid #173b5e;">Sr.<br/>No.</th>
+                        <th style="width:7%;  padding:6pt 2pt; border:1pt solid #173b5e;">SAP<br/>Code</th>
+                        <th style="width:7%;  padding:6pt 2pt; border:1pt solid #173b5e;">Item<br/>Image</th>
+                        <th style="width:19%; padding:6pt 4pt; border:1pt solid #173b5e; text-align:left;">Item Name</th>
+                        <th style="width:8%;  padding:6pt 2pt; border:1pt solid #173b5e;">HSN<br/>Code</th>
+                        <th style="width:9%;  padding:6pt 2pt; border:1pt solid #173b5e;">Part No.</th>
+                        <th style="width:4%;  padding:6pt 2pt; border:1pt solid #173b5e;">Qty</th>
+                        <th style="width:4%;  padding:6pt 2pt; border:1pt solid #173b5e;">Unit</th>
+                        <th style="width:7%;  padding:6pt 2pt; border:1pt solid #173b5e; text-align:right;">Rate (Rs.)</th>
+                        <th style="width:6%;  padding:6pt 2pt; border:1pt solid #173b5e;">Dis-<br/>count</th>
+                        <th style="width:6%;  padding:6pt 2pt; border:1pt solid #173b5e;">Item<br/>Wt.</th>
+                        <th style="width:6%;  padding:6pt 2pt; border:1pt solid #173b5e;">Total<br/>Wt.</th>
+                        <th style="width:5%;  padding:6pt 2pt; border:1pt solid #173b5e;">GST</th>
+                        <th style="width:8%;  padding:6pt 3pt; border:1pt solid #173b5e; text-align:right;">Total (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="sr_no" t-value="0"/>
+                    <t t-foreach="doc.order_line.filtered(lambda l: not l.display_type)" t-as="line">
+                        <t t-set="sr_no" t-value="sr_no + 1"/>
+                        <tr style="font-size:10pt; border-bottom:1pt solid #cbd5e1; vertical-align:middle;">
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1;">
+                                <span t-out="sr_no"/>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1; font-size:9pt;">
+                                <span t-out="line.sap_code or line.product_id.sap_code or ''"/>
+                            </td>
+                            <td style="text-align:center; padding:6pt 2pt; border:1pt solid #cbd5e1;">
+                                <t t-if="line.product_image or line.product_id.image_128 or line.product_id.image_1920">
+                                    <img t-att-src="image_data_uri(line.product_image or line.product_id.image_128 or line.product_id.image_1920)"
+                                         style="max-height:44pt; max-width:44pt; object-fit:contain; display:inline-block;"/>
+                                </t>
+                            </td>
+                            <td style="text-align:left; padding:18pt 5pt; border:1pt solid #cbd5e1;">
+                                <div style="font-weight:bold; font-size:10pt;"><span t-out="line.product_id.name or line.name"/></div>
+                                <div t-if="line.name and line.name != line.product_id.name and line.name != line.product_id.display_name"
+                                     style="font-size:9pt; color:#555;"><span t-out="line.name"/></div>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1; font-size:9pt;">
+                                <span t-out="line.hsn_code or line.product_id.hsn_code or '84484990'"/>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1; font-size:9pt;">
+                                <span t-out="line.part_number or line.product_id.part_number or ''"/>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1;">
+                                <span t-out="'%g' % line.product_uom_qty if line.product_uom_qty else '0'"/>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1;">
+                                <span t-out="line.product_uom_id.name or 'Nos'"/>
+                            </td>
+                            <td style="text-align:right; padding:18pt 5pt; border:1pt solid #cbd5e1;">
+                                <span t-out="doc.format_inr(line.price_unit)"/>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1;">
+                                <span t-if="line.discount" t-out="'%g' % line.discount + '%'"/>
+                                <span t-else="">-</span>
+                            </td>
+                            <td style="text-align:right; padding:18pt 2pt; border:1pt solid #cbd5e1; font-size:9pt;">
+                                <span t-if="line.weight_per_nos" t-out="'%.3f' % line.weight_per_nos"/>
+                            </td>
+                            <td style="text-align:right; padding:18pt 2pt; border:1pt solid #cbd5e1; font-size:9pt;">
+                                <span t-if="line.total_weight" t-out="'%.3f' % line.total_weight"/>
+                            </td>
+                            <td style="text-align:center; padding:18pt 2pt; border:1pt solid #cbd5e1;">
+                                <t t-set="line_tax" t-value="line._get_line_tax_rate()"/>
+                                <span t-if="line_tax &gt; 0" t-out="'%g' % line_tax + '%'"/>
+                                <span t-else="">-</span>
+                            </td>
+                            <td style="text-align:right; padding:18pt 5pt; font-weight:bold; border:1pt solid #cbd5e1;">
+                                <span t-out="doc.format_inr(line._get_line_total_with_tax())"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+            <!-- ═══ 4. BANK DETAILS + TOTALS ═══ -->
+            <t t-set="gst_summary" t-value="doc._get_report_gst_summary()"/>
+            <t t-set="gross_amt" t-value="doc._get_report_gross_amount()"/>
+            <t t-set="trade_disc" t-value="doc._get_report_trade_discount_amount()"/>
+
+            <table style="width:100%; border-collapse:collapse; margin-bottom:8pt;">
+                <tr>
+                    <!-- Bank Details -->
+                    <td style="width:53%; vertical-align:top; padding-right:10pt;">
+                        <table style="width:100%; border-collapse:collapse; border:1.5pt solid #207e8a;">
+                            <thead>
+                                <tr style="background:#207e8a; color:#fff; font-size:10pt; font-weight:bold;">
+                                    <th colspan="2" style="padding:5pt 8pt; text-align:left; text-transform:uppercase;">BANK DETAILS</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-size:10pt; line-height:1.7;">
+                                <tr><td style="padding:4pt 8pt; color:#333; width:30%;"><strong>Bank:</strong></td>
+                                    <td style="padding:4pt 8pt;"><span t-out="doc.bank_name or 'State Bank of India'"/></td></tr>
+                                <tr><td style="padding:4pt 8pt; color:#333;"><strong>A/c Name:</strong></td>
+                                    <td style="padding:4pt 8pt;"><span t-out="doc.bank_account_name or 'Padmaavati Engineers LLP'"/></td></tr>
+                                <tr><td style="padding:4pt 8pt; color:#333;"><strong>A/c No.:</strong></td>
+                                    <td style="padding:4pt 8pt;"><span t-out="doc.bank_account_no or '1234567890123'"/></td></tr>
+                                <tr><td style="padding:4pt 8pt; color:#333;"><strong>IFSC:</strong></td>
+                                    <td style="padding:4pt 8pt;"><span t-out="doc.bank_ifsc or 'SBIN0001234'"/></td></tr>
+                                <tr><td style="padding:4pt 8pt; color:#333;"><strong>Branch:</strong></td>
+                                    <td style="padding:4pt 8pt;"><span t-out="doc.bank_branch or 'Surat Main'"/></td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <!-- Totals -->
+                    <td style="width:47%; vertical-align:top;">
+                        <table style="width:100%; border-collapse:collapse; font-size:10pt; border:1pt solid #cbd5e1;">
+                            <tbody>
+                                <tr style="border-bottom:1pt solid #cbd5e1;">
+                                    <td style="padding:5pt 8pt; color:#333;">Gross Amount</td>
+                                    <td style="padding:5pt 8pt; text-align:right;"><span t-out="doc.format_inr(gross_amt)"/></td>
+                                </tr>
+                                <tr t-if="trade_disc &gt; 0" style="border-bottom:1pt solid #cbd5e1;">
+                                    <td style="padding:5pt 8pt; color:#333;">Less: Discount</td>
+                                    <td style="padding:5pt 8pt; text-align:right;">(<span t-out="doc.format_inr(trade_disc)"/>)</td>
+                                </tr>
+                                <tr t-if="doc.cash_discount_amount and doc.cash_discount_amount &gt; 0"
+                                    style="border-bottom:1pt solid #cbd5e1;">
+                                    <td style="padding:5pt 8pt; color:#333;">Less: Cash Discount</td>
+                                    <td style="padding:5pt 8pt; text-align:right;">(<span t-out="doc.format_inr(doc.cash_discount_amount)"/>)</td>
+                                </tr>
+                                <tr t-if="doc.freight_amount and doc.freight_amount &gt; 0"
+                                    style="border-bottom:1pt solid #cbd5e1;">
+                                    <td style="padding:5pt 8pt; color:#333;">Add: Freight (GST <span t-out="'%g' % doc.freight_tax_rate + '%'"/>)</td>
+                                    <td style="padding:5pt 8pt; text-align:right;"><span t-out="doc.format_inr(doc.freight_amount)"/></td>
+                                </tr>
+                                <tr style="border-bottom:1pt solid #cbd5e1; font-weight:bold; background:#f8fafc;">
+                                    <td style="padding:5pt 8pt;">Taxable Value</td>
+                                    <td style="padding:5pt 8pt; text-align:right;"><span t-out="gst_summary['total_taxable_fmt']"/></td>
+                                </tr>
+                                <t t-if="gst_summary['total_tax'] &gt; 0">
+                                    <t t-if="gst_summary['is_interstate']">
+                                        <tr style="border-bottom:1pt solid #cbd5e1;">
+                                            <td style="padding:5pt 8pt; color:#333;">IGST</td>
+                                            <td style="padding:5pt 8pt; text-align:right;"><span t-out="gst_summary['total_igst_fmt']"/></td>
+                                        </tr>
+                                    </t>
+                                    <t t-else="">
+                                        <tr style="border-bottom:1pt solid #cbd5e1;">
+                                            <td style="padding:5pt 8pt; color:#333;">CGST</td>
+                                            <td style="padding:5pt 8pt; text-align:right;"><span t-out="gst_summary['total_cgst_fmt']"/></td>
+                                        </tr>
+                                        <tr style="border-bottom:1pt solid #cbd5e1;">
+                                            <td style="padding:5pt 8pt; color:#333;">SGST</td>
+                                            <td style="padding:5pt 8pt; text-align:right;"><span t-out="gst_summary['total_sgst_fmt']"/></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr style="background:#173b5e; color:#fff; font-weight:bold; font-size:11pt;">
+                                    <td style="padding:6pt 8pt;">GRAND TOTAL (Rs.)</td>
+                                    <td style="padding:6pt 8pt; text-align:right;"><span t-out="gst_summary['grand_total_fmt']"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- ═══ 5. AMOUNT IN WORDS ═══ -->
+            <div style="background:#e8edf2; border:1pt solid #cbd5e1; padding:7pt 10pt;
+                        margin-bottom:8pt; font-size:10.5pt; font-weight:bold; color:#111;">
+                Amount in words: <span t-out="doc._get_report_amount_in_words()"/>
+            </div>
+
+            <!-- ═══ 6. HSN / GST BREAKUP ═══ -->
+            <table t-if="gst_summary['total_tax'] &gt; 0" style="width:100%; border-collapse:collapse; margin-bottom:8pt; font-size:10pt;">
+                <thead>
+                    <tr style="background:#173b5e; color:#fff; font-weight:bold; text-align:center;">
+                        <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:14%;">HSN Code</th>
+                        <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:18%; text-align:right;">Taxable Value (Rs.)</th>
+                        <t t-if="gst_summary['is_interstate']">
+                            <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:24%;">IGST Rate</th>
+                            <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:24%; text-align:right;">IGST Amount (Rs.)</th>
+                        </t>
+                        <t t-else="">
+                            <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:12%;">CGST Rate</th>
+                            <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:16%; text-align:right;">CGST Amount (Rs.)</th>
+                            <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:12%;">SGST Rate</th>
+                            <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:16%; text-align:right;">SGST Amount (Rs.)</th>
+                        </t>
+                        <th style="padding:5pt 5pt; border:1pt solid #173b5e; width:16%; text-align:right;">Total Tax (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="gst_summary['rows']" t-as="r">
+                        <tr>
+                            <td style="padding:5pt 5pt; text-align:center; border:1pt solid #cbd5e1;"><span t-out="r['hsn_code']"/></td>
+                            <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="r['taxable_value_fmt']"/></td>
+                            <t t-if="gst_summary['is_interstate']">
+                                <td style="padding:5pt 5pt; text-align:center; border:1pt solid #cbd5e1;"><span t-out="r['igst_rate']"/></td>
+                                <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="r['igst_amount_fmt']"/></td>
+                            </t>
+                            <t t-else="">
+                                <td style="padding:5pt 5pt; text-align:center; border:1pt solid #cbd5e1;"><span t-out="r['cgst_rate']"/></td>
+                                <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="r['cgst_amount_fmt']"/></td>
+                                <td style="padding:5pt 5pt; text-align:center; border:1pt solid #cbd5e1;"><span t-out="r['sgst_rate']"/></td>
+                                <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="r['sgst_amount_fmt']"/></td>
+                            </t>
+                            <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="r['total_tax_fmt']"/></td>
+                        </tr>
+                    </t>
+                    <tr style="font-weight:bold; background:#f1f5f9; border-top:1pt solid #173b5e;">
+                        <td style="padding:5pt 5pt; text-align:center; border:1pt solid #cbd5e1;">Total</td>
+                        <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="gst_summary['total_taxable_fmt']"/></td>
+                        <t t-if="gst_summary['is_interstate']">
+                            <td style="padding:5pt 5pt; border:1pt solid #cbd5e1;"></td>
+                            <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="gst_summary['total_igst_fmt']"/></td>
+                        </t>
+                        <t t-else="">
+                            <td style="padding:5pt 5pt; border:1pt solid #cbd5e1;"></td>
+                            <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="gst_summary['total_cgst_fmt']"/></td>
+                            <td style="padding:5pt 5pt; border:1pt solid #cbd5e1;"></td>
+                            <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="gst_summary['total_sgst_fmt']"/></td>
+                        </t>
+                        <td style="padding:5pt 5pt; text-align:right; border:1pt solid #cbd5e1;"><span t-out="gst_summary['total_tax_fmt']"/></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ═══ 7. TERMS &amp; CONDITIONS ═══ -->
+            <div style="border:1.5pt solid #207e8a; margin-bottom:10pt;">
+                <div style="background:#207e8a; color:#fff; font-size:10pt; font-weight:bold;
+                            padding:5pt 8pt; text-transform:uppercase;">TERMS &amp; CONDITIONS</div>
+                <div style="padding:7pt 10pt; font-size:10pt; line-height:1.6; color:#222;">
+                    <ol style="margin:0; padding-left:16pt;">
+                        <li>
+                            <t t-if="is_proforma">This is a Proforma Invoice and not a Tax Invoice; it is issued for payment/confirmation purposes only.</t>
+                            <t t-elif="doc.state in ['draft','sent']">This is a Quotation and not a Tax Invoice; it is issued for price quotation and order confirmation purposes only.</t>
+                            <t t-else="">This is a Sales Order confirmation and not a Tax Invoice; it is issued for confirmation purposes only.</t>
+                        </li>
+                        <li>Prices are valid until <span t-out="(doc.validity_date and doc.validity_date.strftime('%d-%b-%Y')) or (doc.date_order and doc.date_order.strftime('%d-%b-%Y')) or '30 days'"/>. Delivery: 7-10 working days from receipt of payment.</li>
+                        <li>Freight is charged extra with applicable GST. Cash discount is applicable on the discounted value, subject to payment within the agreed terms.</li>
+                        <li>GST charged as applicable (CGST + SGST for intra-state; IGST for inter-state supply).</li>
+                        <li>Goods once sold will not be taken back. Subject to Surat jurisdiction.</li>
+                    </ol>
+                    <div t-if="doc.note" style="margin-top:5pt; padding-top:4pt; border-top:1pt dashed #cbd5e1; font-style:italic;">
+                        <span t-field="doc.note"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ 8. SIGNATURE ═══ -->
+            <table style="width:100%; border-collapse:collapse; margin-top:8pt; margin-bottom:5pt;">
+                <tr>
+                    <td style="width:60%;"></td>
+                    <td style="width:40%; text-align:center; vertical-align:top;">
+                        <div style="font-size:11pt; font-weight:bold;">For PADMAAVATI ENGINEERS LLP</div>
+                        <div style="height:50pt;"></div>
+                        <div style="border-top:1pt solid #555; width:80%; margin:0 auto;
+                                    padding-top:4pt; font-size:10pt; color:#333;">Authorised Signatory</div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Footer note -->
+            <div style="text-align:center; font-size:9pt; color:#777; margin-top:6pt;">
+                <t t-if="is_proforma">This is a computer generated proforma invoice.</t>
+                <t t-elif="doc.state in ['draft','sent']">This is a computer generated quotation.</t>
+                <t t-else="">This is a computer generated sales order.</t>
+            </div>
+
+        </div>
+    </template>
+
+    <!-- Wrapper: Quotation / Sales Order -->
+    <template id="report_padmaavati_saleorder">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="padmaavati_sales.padmaavati_report_saleorder_document"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Wrapper: Pro-Forma Invoice -->
+    <template id="report_padmaavati_saleorder_proforma">
+        <t t-call="web.html_container">
+            <t t-set="is_pro_forma" t-value="True"/>
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="padmaavati_sales.padmaavati_report_saleorder_document"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Override default Odoo quotation/order print to also use our template -->
+    <template id="report_saleorder_document_inherit_padmaavati"
+              inherit_id="sale.report_saleorder_document" priority="99">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-call="padmaavati_sales.padmaavati_report_saleorder_document"/>
+        </xpath>
+    </template>
+</odoo>
